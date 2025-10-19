@@ -1,0 +1,11 @@
+1. Crear App con asp.net
+2. Crear carpeta Data/Mapping /Models/Repository
+3. Installar desde el Nuget
+    -EntityFramework
+    -EntityFramework.Tools
+4. Installar dotnet add package Microsoft.EntityFrameworkCore.Design
+5. Para realiazar migraciones: 
+    instalar: dotnet tool install --global dotnet-ef
+6. Migraticiones: 
+    a-dotnet ef migration add InitialMigration
+    b- Luego realizar el "dotnet ef database update" Aplica las migraciones correspondientes.
