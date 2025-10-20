@@ -13,3 +13,37 @@
     -Interaz con la firma de los metodos que se necesitan en un servicio.
     - La interfaz se aplica a una clase Repository que trabaja con genericos para que se pueda reutilizar en el acceso a datos.
 8. Implementacion de Dtos para peticion y crear objetos. 
+    - Dto para servir los datos, con las propiedades necesarias.
+    - Dto para la creacion del Objeto con las propiedades requeridas.
+        - Se decora la propiedades con [Requerid] con las validaciones necesarias.
+9. Descargar del nuger el automapper.
+    -Crear en carpeta Mapping el Mapping de la clase correspondientes ejemplo Category
+    -El Category hereda de Profile para el mapping 
+                    CreateMap<Category, CreateCategoryDto>().ReverseMap();
+10. Controlador
+    -Tiene que ser API Controller
+    -En el controller colocar como decorador  el tipo de peticion y los distintos codigos que puede devolver[httpGet]
+    -Crear un metodo de tipo IActionResult 
+    - en el metodo llamar al Repository y al dto de la clase en cuestion y mapear los datos al dto.
+
+
+
+    -Para crear un objeto :
+        -pasar por [FromBody por parametros en Dto]
+        -Consultar si yha existe si no lanzar un badrequest.
+        - Usar el ModelState para lanzar los errores en la creacion.
+
+        var category = _mapper.Map<Category>(createCategoryDto);
+            if (!_categoryRepository.CreateCategory(category))
+            {
+                ModelState.AddModelError("CustomError", $"Algo salio mal al crear la categoria con el nombre {category.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCategory", new { id = category.Id }, category);
+            
+    Tengo que averiguar porq se retorna asi al final con el CreatedRoute.
+11. En el program debemos especificar como hacemos la inyeccion de dependencias:
+    - Configurar el mapping y los addscoped. (tener en cuenta las versiones instaladas puede ser que no sean compatibles.)
+    builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+    builder.Services.AddAutoMapper(typeof(Program));
