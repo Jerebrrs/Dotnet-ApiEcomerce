@@ -9,3 +9,7 @@
 6. Migraticiones: 
     a-dotnet ef migration add InitialMigration
     b- Luego realizar el "dotnet ef database update" Aplica las migraciones correspondientes.
+7. Patron Repository
+    -Interaz con la firma de los metodos que se necesitan en un servicio.
+    - La interfaz se aplica a una clase Repository que trabaja con genericos para que se pueda reutilizar en el acceso a datos.
+8. Implementacion de Dtos para peticion y crear objetos. 
