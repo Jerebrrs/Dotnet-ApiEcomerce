@@ -32,9 +32,6 @@ public class CategoryRepository : ICategoryRepository
 
     public bool DeleteCategory(Category category)
     {
-        Category cat = GetCategory(category.Id);
-        if (cat == null) return false;
-
         _db.Categories.Remove(category);
         return Save();
     }
@@ -56,9 +53,6 @@ public class CategoryRepository : ICategoryRepository
 
     public bool UpdateCategory(Category category)
     {
-        Category cat = GetCategory(category.Id);
-        if (cat == null) return false;
-
         category.CreationDate = DateTime.Now;
         _db.Categories.Update(category);
         return Save();
