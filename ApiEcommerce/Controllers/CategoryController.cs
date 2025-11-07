@@ -25,11 +25,7 @@ namespace ApiEcommerce.Controllers
         public IActionResult GetCategories()
         {
             var categories = _categoryRepository.GetCategories();
-            var categoryDto = new List<CategoryDto>();
-            foreach (var cat in categories)
-            {
-                categoryDto.Add(_mapper.Map<CategoryDto>(cat));
-            }
+            var categoryDto = _mapper.Map<List<CategoryDto>>(categories);
             return Ok(categoryDto);
         }
 

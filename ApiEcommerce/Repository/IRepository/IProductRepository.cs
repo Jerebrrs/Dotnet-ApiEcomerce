@@ -7,12 +7,12 @@ public interface IProductRepository
 {
     ICollection<Product> GetProducts();
     ICollection<Product> GetProductsForCategory(int categoryId);
-    ICollection<Product> SearchProduct(string name);
+    ICollection<Product> SearchProducts(string searchTeam);
 
     Product? GetProduct(int id);
     bool BuyProduct(string name, int cant);
-    bool ProductExists(int id);
-    bool ProductExists(string name);
+    bool ProductExist(int id);
+    bool ProductExist(string name);
     bool CreateProduct(Product product);
     bool UpdateProduct(Product product);
     bool DeleteProduct(Product product);
