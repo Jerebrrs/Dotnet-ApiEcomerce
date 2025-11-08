@@ -11,5 +11,6 @@ namespace ApiEcommerce.Data
         }
         public DbSet<Category> Categories { get; set; } //Para la base de datos siempre en prural
         public DbSet<Product> Products { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
