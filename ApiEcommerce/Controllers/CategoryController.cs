@@ -1,13 +1,16 @@
+using ApiEcommerce.Constans;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -19,6 +22,7 @@ namespace ApiEcommerce.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -29,14 +33,20 @@ namespace ApiEcommerce.Controllers
             return Ok(categoryDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetCategory")]
+        // [ResponseCache(Duration = 10)]
+        [ResponseCache(CacheProfileName = CacheProfiles.Default10)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetCategory(int id)
         {
+            Console.WriteLine($"Categoria con el id:{id} a las {DateTime.Now}");
             var category = _categoryRepository.GetCategory(id);
+
+            Console.WriteLine($"Respuesta con el id:{id} a las {DateTime.Now}");
             if (category == null)
             {
                 return NotFound($"La categoria con el id: {id} no existe.");
