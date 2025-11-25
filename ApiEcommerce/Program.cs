@@ -2,8 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using ApiEcommerce.Constans;
 using ApiEcommerce.Data;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,8 +20,9 @@ builder.Services.AddResponseCaching(options =>
 });
 
 builder.Services.AddRepositories();
-
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
+
 if (string.IsNullOrEmpty(secretKey)) throw new InvalidOperationException("SecretKey es nula.");
 
 builder.Services.AddAutoMapper(typeof(Program));
@@ -82,8 +84,50 @@ builder.Services.AddSwaggerGen(
         new List<string>()
       }
     });
+      options.SwaggerDoc("v1", new OpenApiInfo
+      {
+          Version = "v1",
+          Title = "Api Ecommerce",
+          Description = "Api para gestionar productos y usuarios",
+          TermsOfService = new Uri("https://exameple.com/terms"),
+          Contact = new OpenApiContact
+          {
+              Name = "Kevin"
+          },
+          License = new OpenApiLicense
+          {
+              Name = "Liciciencia de uso "
+          }
+      });
+      options.SwaggerDoc("v2", new OpenApiInfo
+      {
+          Version = "v2",
+          Title = "Api Ecommerce",
+          Description = "Api para gestionar productos y usuarios",
+          TermsOfService = new Uri("https://exameple.com/terms"),
+          Contact = new OpenApiContact
+          {
+              Name = "Kevin"
+          },
+          License = new OpenApiLicense
+          {
+              Name = "Liciciencia de uso "
+          }
+      });
   }
 );
+var apiVersioningBuilder = builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    // options.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"));
+});
+apiVersioningBuilder.AddApiExplorer(opttions =>
+{
+    opttions.GroupNameFormat = "'v'VVV";
+    opttions.SubstituteApiVersionInUrl = true;
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(PolicyNames.AllowSpecificOrigin,
@@ -98,7 +142,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+    });
 }
 
 app.UseHttpsRedirection();
