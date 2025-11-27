@@ -2,7 +2,7 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,13 +19,11 @@ namespace ApiEcommerce.Controllers
 
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IMapper _mapper;
 
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
-            _mapper = mapper;
         }
         [AllowAnonymous]
         [HttpGet]
@@ -34,7 +32,7 @@ namespace ApiEcommerce.Controllers
         public IActionResult GetProducts()
         {
             var products = _productRepository.GetProducts();
-            var productDto = _mapper.Map<List<ProductDto>>(products);
+            var productDto = products.Adapt<List<ProductDto>>();
             return Ok(productDto);
         }
 
@@ -51,8 +49,7 @@ namespace ApiEcommerce.Controllers
             {
                 return NotFound($"El Producto con el id: {productId} no existe.");
             }
-            var productDto = _mapper.Map<ProductDto>(product);
-
+            var productDto = product.Adapt<ProductDto>();
             return Ok(productDto);
         }
 
@@ -66,7 +63,7 @@ namespace ApiEcommerce.Controllers
         {
             if (createProductDto == null)
             {
-                return BadRequest(ModelState); //ModelState?????
+                return BadRequest(ModelState);
             }
             if (_productRepository.ProductExist(createProductDto.Name))
             {
@@ -79,14 +76,14 @@ namespace ApiEcommerce.Controllers
                 return BadRequest(ModelState);
             }
 
-            var product = _mapper.Map<Product>(createProductDto);
+            var product = createProductDto.Adapt<Product>();
             if (!_productRepository.CreateProduct(product))
             {
                 ModelState.AddModelError("CustomError", $"Algo salio mal al crear el producto con el nombre {product.Name}");
                 return StatusCode(500, ModelState);
             }
             var createProduct = _productRepository.GetProduct(product.ProductId);
-            var productDto = _mapper.Map<ProductDto>(createProduct);
+            var productDto = createProduct.Adapt<ProductDto>();
             return CreatedAtRoute("GetProduct", new { productId = product.ProductId }, productDto);
         }
 
@@ -102,8 +99,7 @@ namespace ApiEcommerce.Controllers
             {
                 return NotFound($"Los productos con la categoria id: {productId} no existe.");
             }
-            var productsDto = _mapper.Map<List<ProductDto>>(products);
-
+            var productsDto = products.Adapt<List<ProductDto>>();
             return Ok(productsDto);
         }
         [HttpGet("searchByCategoryByNameDescription/{searchTeam}", Name = "SearchProducts")]
@@ -118,8 +114,7 @@ namespace ApiEcommerce.Controllers
             {
                 return NotFound($"Los productos con el nombre o descripcion:{searchTeam} no existe.");
             }
-            var productsDto = _mapper.Map<List<ProductDto>>(products);
-
+            var productsDto = products.Adapt<List<ProductDto>>();
             return Ok(productsDto);
         }
         [HttpPatch("buyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
@@ -168,7 +163,7 @@ namespace ApiEcommerce.Controllers
                 ModelState.AddModelError("CustomError", $"La categoría con el {updateProductDto.CategoryId} no existe");
                 return BadRequest(ModelState);
             }
-            var product = _mapper.Map<Product>(updateProductDto);
+            var product = updateProductDto.Adapt<Product>();
             product.ProductId = productId;
             if (!_productRepository.UpdateProduct(product))
             {

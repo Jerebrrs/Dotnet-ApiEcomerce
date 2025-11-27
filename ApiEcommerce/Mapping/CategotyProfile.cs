@@ -1,18 +1,16 @@
 
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
-using AutoMapper;
+using Mapster;
 
-namespace ApiEcommerce.Mapping
+namespace ApiEcommerce.Mapping;
+
+public static class CategoryMappingConfig
 {
-    public class CategotyProfile : Profile
+    public static void Register()
     {
-        public CategotyProfile()
-        {
-            CreateMap<Category, CategoryDto>().ReverseMap();
-            CreateMap<Category, CreateCategoryDto>().ReverseMap();
-
-        }
-
+        TypeAdapterConfig<Category, CategoryDto>.NewConfig();
+        TypeAdapterConfig<Category, CreateCategoryDto>.NewConfig();
+        // ReverseMap no es necesario, Mapster soporta bidireccional por defecto si las propiedades coinciden
     }
 }

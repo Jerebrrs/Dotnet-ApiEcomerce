@@ -1,7 +1,7 @@
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +14,10 @@ namespace ApiEcommerce.Controllers.V2
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
-            _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -29,7 +27,7 @@ namespace ApiEcommerce.Controllers.V2
         public IActionResult GetCategoriesOrderById()
         {
             var categories = _categoryRepository.GetCategories().OrderBy(cat => cat.Id);
-            var categoryDto = _mapper.Map<List<CategoryDto>>(categories);
+            var categoryDto = categories.Adapt<List<CategoryDto>>();
             return Ok(categoryDto);
         }
 

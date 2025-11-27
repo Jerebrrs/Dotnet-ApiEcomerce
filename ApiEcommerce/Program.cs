@@ -2,12 +2,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using ApiEcommerce.Constans;
 using ApiEcommerce.Data;
+using ApiEcommerce.Models;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Mapster;
+using ApiEcommerce.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 var dbConnectionString = builder.Configuration.GetConnectionString("ConexionSql");
@@ -20,12 +23,17 @@ builder.Services.AddResponseCaching(options =>
 });
 
 builder.Services.AddRepositories();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
 
 if (string.IsNullOrEmpty(secretKey)) throw new InvalidOperationException("SecretKey es nula.");
 
-builder.Services.AddAutoMapper(typeof(Program));
+
+// Registrar configuraciones de Mapster
+ProductMappingConfig.Register();
+CategoryMappingConfig.Register();
+UserMappingConfig.Register();
+builder.Services.AddMapster();
 
 builder.Services.AddAuthentication(options =>
 {
